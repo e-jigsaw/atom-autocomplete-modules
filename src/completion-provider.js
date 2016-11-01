@@ -213,7 +213,6 @@ class CompletionProvider {
           const prefixSplit = prefix.split('/');
           const modulePrefix = prefixSplit[0];
           const realPrefix = prefixSplit.pop();
-          const moduleSearchPath = prefixSplit.join('/');
 
           // get the alias configs for the specific module
           const aliasConfig = Array.isArray(pluginConfig[1])
@@ -229,14 +228,26 @@ class CompletionProvider {
 
           return Promise.all(rootPromises.concat(aliasConfig.map(
             (alias) => {
-              // The search path is the parent directory of the source directory specified in .babelrc
-              // then we append the `moduleSearchPath` to get the real search path
-              const searchPath = path.join(
-                path.dirname(path.resolve(projectPath, alias.src)),
-                moduleSearchPath
-              );
+              // Monky patched
+              const ps = prefix.split('/')
+              const fc = ps.slice(-1)[0]
+              const dc = ps.length > 2 ? ps.slice(1, -1).join('/') : ''
 
-              return this.lookupLocal(realPrefix, searchPath);
+              return readdir(path.resolve(projectPath, alias.src, dc)).catch((e) => {
+                if (e.code !== 'ENOENT') {
+                  throw e;
+                }
+
+                return [];
+              }).filter(
+                (filename) => filename[0] !== '.'
+              ).map((pathname) => ({
+                text: pathname,
+                displayText: pathname,
+                type: 'import'
+              })).then(
+                (suggestions) => this.filterSuggestions(fc, suggestions)
+              );
             }
           ))).then(
             (suggestions) => [].concat(...suggestions)
