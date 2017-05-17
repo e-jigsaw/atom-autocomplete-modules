@@ -1,7 +1,7 @@
 {
   "name": "autocomplete-modules",
   "main": "./src/main",
-  "version": "1.6.7",
+  "version": "1.6.10",
   "description": "Autocomplete for require/import statements",
   "keywords": [
     "javascript",
@@ -19,7 +19,7 @@
     "atom": ">=0.174.0 <2.0.0"
   },
   "dependencies": {
-    "bluebird": "3.4.6",
+    "bluebird": "3.5.0",
     "find-babel-config": "1.0.1",
     "fuzzaldrin": "2.1.0",
     "lodash.escaperegexp": "4.1.2",
@@ -38,5 +38,13 @@
         "2.0.0": "getCompletionProvider"
       }
     }
-  }
+  },
+  "activationHooks": [
+    "language-javascript:grammar-used",
+    "language-babel:grammar-used",
+    "language-coffee-script:grammar-used",
+    "language-ts:grammar-used",
+    "language-typescript-grammars-only:grammar-used",
+    "atom-typescript:grammar-used"
+  ]
 }
